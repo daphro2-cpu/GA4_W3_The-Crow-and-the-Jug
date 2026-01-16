@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GA4 • Reading Vocab • Unscramble in Context</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111c33;
+      --card:#0b1226;
+      --ink:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#24324f;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --warn:#f59e0b;
+      --accent:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Century Gothic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 700px at 20% 10%, #1a2a55 0%, var(--bg) 60%);
+      color:var(--ink);
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:18px 14px 40px}
+
+    header{
+      display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(96,165,250,.15), rgba(96,165,250,.04));
+      padding:14px;border-radius:14px;
+    }
+    .brand{display:flex;gap:12px;align-items:center;min-width:0}
+    .logo{
+      width:56px;height:56px;object-fit:contain;border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(11,18,38,.55);
+      padding:6px;flex:0 0 auto;
+    }
+    h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.35}
+
+    .meta{display:flex;flex-direction:column;gap:8px;align-items:flex-end;min-width:240px}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      font-size:12px;border:1px solid var(--line);background: rgba(17,28,51,.7);
+      padding:6px 10px;border-radius:999px;user-select:none;
+    }
+    .pill b{color:#fff}
+    .bar{
+      width:240px;height:10px;background: rgba(255,255,255,.07);
+      border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10);
+    }
+    .bar>div{
+      height:100%;width:0%;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      transition: width .25s ease;
+    }
+
+    main{margin-top:14px;display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+    @media (max-width: 860px){
+      main{grid-template-columns:1fr}
+      .meta{align-items:flex-start;min-width:0}
+      .pillrow{justify-content:flex-start}
+      .bar{width:100%}
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      background: rgba(17,28,51,.55);
+      border-radius:14px;
+      padding:12px;
+    }
+    .panel h2{
+      margin:0 0 10px;font-size:14px;color:#fff;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .tag{
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);
+      background: rgba(11,18,38,.7);
+      padding:4px 8px;border-radius:999px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background: rgba(11,18,38,.7);
+      border-radius:14px;
+      padding:14px;
+    }
+    .qtype{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .prompt{font-size:16px;line-height:1.35;margin:0 0 10px}
+    .sentence{
+      font-size:14px;color:var(--ink);
+      border-left:3px solid rgba(96,165,250,.5);
+      padding-left:10px;margin:8px 0 10px;line-height:1.55;
+    }
+    .help{
+      color:var(--muted);
+      font-size:13px;
+      margin:6px 0 10px;
+      line-height:1.45;
+    }
+
+    .answerBox{
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:12px;
+      padding:10px;
+      min-height:46px;
+      display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+      background: rgba(11,18,38,.45);
+    }
+    .ghost{color: rgba(156,163,175,.85);font-size:13px}
+
+    .tileRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .tile{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(31,42,68,.7);
+      padding:8px 10px;border-radius:999px;
+      cursor:pointer;user-select:none;font-size:14px;
+      transition: transform .05s ease, border-color .2s ease;
+    }
+    .tile:hover{border-color: rgba(96,165,250,.55)}
+    .tile:active{transform: translateY(1px)}
+    .tile.selected{
+      border-color: rgba(34,197,94,.7);
+      background: rgba(34,197,94,.18);
+    }
+    .tile.disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .feedback{
+      margin-top:10px;
+      font-size:13px;color:var(--muted);
+      line-height:1.4;
+      min-height: 22px;
+    }
+    .feedback b{color:#fff}
+    .feedback .good{color: var(--good)}
+    .feedback .bad{color: var(--bad)}
+    .feedback .hint{color: #cbd5e1}
+
+    .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    button.smallbtn{
+      width:auto;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(34,211,238,.20), rgba(31,42,68,.65));
+      color:var(--ink);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+    }
+    button.smallbtn.secondary{
+      background: linear-gradient(180deg, rgba(96,165,250,.12), rgba(31,42,68,.65));
+      border-color: rgba(96,165,250,.25);
+    }
+    button.smallbtn[disabled]{opacity:.55;cursor:not-allowed}
+
+    .note{
+      font-size:12.5px;color:var(--muted);line-height:1.4;
+      border-left:3px solid rgba(245,158,11,.55);padding-left:10px;
+    }
+
+    .done{
+      display:none;margin-top:10px;padding:12px;border-radius:14px;
+      border:1px solid rgba(34,197,94,.35);
+      background: rgba(34,197,94,.10);
+    }
+    .done h3{margin:0 0 6px;font-size:15px}
+    .done p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+
+    .reviewBox{
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(11,18,38,.55);
+      border-radius:12px;
+      padding:10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .chip{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(31,42,68,.55);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12.5px;
+      color: var(--ink);
+    }
+
+    .timerPill{
+      border:1px solid rgba(245,158,11,.35);
+      background: rgba(245,158,11,.10);
+      color: #fde68a;
+    }
+    .timerPill b{color:#fff}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="logo.png" alt="Logo" class="logo" />
+        <div>
+          <h1>GA4 • Vocab Unscramble in Context</h1>
+          <div class="sub">
+            Click the letters (or words) to fill the blank.<br/>
+            You have <b>20 seconds</b> for each one.
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="pillrow">
+          <div class="pill"><b>Progress</b> <span id="progTxt">0/0</span></div>
+          <div class="pill"><b>Score</b> <span id="scoreTxt">0</span></div>
+          <div class="pill timerPill"><b>Timer</b> <span id="qTimeTxt">20</span>s</div>
+        </div>
+        <div class="bar"><div id="progBar"></div></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>
+          <span id="sectionTitle">Unscramble</span>
+          <span class="tag" id="sectionTag">Click
