@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>The Crow and the Jug – Vocab Unscramble Practice</title>
+<title>The Crow and the Jug – Online Practice</title>
 
 <style>
   body{
@@ -52,6 +52,7 @@
     user-select:none;
   }
   .tile.used{opacity:.35;}
+  .tile.locked{opacity:.25; cursor:not-allowed;}
 
   .answerBox{
     margin-top:6px;
@@ -63,10 +64,27 @@
     background:#fff;
   }
 
-  .rowBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center;}
+  .rowBtns{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top:8px;
+  }
+  .timerPill{
+    font-weight:800;
+    color:#333;
+    background:#fff7ed;
+    border:1px solid rgba(245,158,11,.35);
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12.5px;
+  }
+
   .feedback{margin-left:8px;font-weight:800;}
   .good{color:#138a36;}
   .bad{color:#b00020;}
+  .warn{color:#b45309;}
 
   button{
     padding:8px 14px;
@@ -87,9 +105,22 @@
     font-size:12px;
     padding:4px 10px;
   }
+  button:disabled{opacity:.55; cursor:not-allowed;}
+
+  select{padding:6px;border-radius:6px;min-width:180px;}
 
   hr{border:none;border-top:1px solid #eee;margin:14px 0;}
+
+  .qblock{
+    background:#fafafe;
+    border:1px solid #ececf5;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:12px;
+  }
+  .tiny{font-size:13px;color:#555;margin-top:6px;}
   .scoreline{font-weight:700;margin-top:8px;}
+
   .footer{
     text-align:center;
     font-size:12px;
@@ -107,7 +138,7 @@
     <img src="logo.png" alt="School Logo">
     <div>
       <h1>The Crow and the Jug</h1>
-      <div class="sub">GA4 • Vocab Unscramble in Context</div>
+      <div class="sub">GA4 • Online Reading & Vocabulary Practice</div>
     </div>
   </div>
 
@@ -115,10 +146,10 @@
   <div class="box">
     <div class="note">
       <b>How to play:</b><br>
-      • Read the clue (meaning + sentence).<br>
-      • Click the letters to build the missing word.<br>
+      • Part 1: Read the clue. Click letters to build the missing word. You have <b>20 seconds</b> for each word.<br>
       • You can reset <b>each word</b> if you need to.<br>
-      • When you finish, click <b>Check</b>.
+      • Part 2: Choose the best word for each sentence.<br>
+      • Part 3: Comprehension questions about the story.
     </div>
   </div>
 
@@ -129,27 +160,85 @@
 
     <ol id="spellingList"></ol>
 
-    <button onclick="checkSpelling()">Check ✅</button>
-    <button class="secondary" onclick="resetSpelling()">Reset All 🔄</button>
+    <button onclick="checkSpelling()">Check Part 1 ✅</button>
+    <button class="secondary" onclick="resetSpelling()">Reset Part 1 🔄</button>
 
     <div class="scoreline">Score: <span id="spellScore">0/10</span></div>
   </div>
 
+  <!-- PART 2: CONTEXT -->
+  <div class="box">
+    <h2>Part 2: Vocabulary in Context</h2>
+    <p>Choose the best word to complete each sentence.</p>
+
+    <ol id="contextList"></ol>
+
+    <button onclick="checkContext()">Check Part 2 ✅</button>
+    <button class="secondary" onclick="resetContext()">Reset Part 2 🔄</button>
+    <div class="scoreline">Score: <span id="ctxScore">0/10</span></div>
+  </div>
+
+  <!-- PART 3: COMPREHENSION -->
+  <div class="box">
+    <h2>Part 3: Reading Comprehension</h2>
+    <p>Choose the best answer. If you miss, read the tip and try again.</p>
+
+    <div class="qblock">
+      <strong>1) Where did the crow land when he got very tired?</strong><br>
+      <label><input type="radio" name="q1" value="a"> In a desert.</label><br>
+      <label><input type="radio" name="q1" value="b"> In a forest.</label>
+      <div id="qf1" class="feedback"></div>
+      <div id="qh1" class="tiny"></div>
+    </div>
+
+    <div class="qblock">
+      <strong>2) Why couldn’t the crow drink the water right away?</strong><br>
+      <label><input type="radio" name="q2" value="a"> The jug was too narrow.</label><br>
+      <label><input type="radio" name="q2" value="b"> The crow forgot where it was.</label>
+      <div id="qf2" class="feedback"></div>
+      <div id="qh2" class="tiny"></div>
+    </div>
+
+    <div class="qblock">
+      <strong>3) What did the crow drop into the jug?</strong><br>
+      <label><input type="radio" name="q3" value="a"> Leaves.</label><br>
+      <label><input type="radio" name="q3" value="b"> Small stones.</label>
+      <div id="qf3" class="feedback"></div>
+      <div id="qh3" class="tiny"></div>
+    </div>
+
+    <div class="qblock">
+      <strong>4) What happened to the water level after the crow dropped stones in?</strong><br>
+      <label><input type="radio" name="q4" value="a"> It rose higher.</label><br>
+      <label><input type="radio" name="q4" value="b"> It disappeared.</label>
+      <div id="qf4" class="feedback"></div>
+      <div id="qh4" class="tiny"></div>
+    </div>
+
+    <div class="qblock">
+      <strong>5) What lesson does the story teach?</strong><br>
+      <label><input type="radio" name="q5" value="a"> If you think carefully, you can solve problems.</label><br>
+      <label><input type="radio" name="q5" value="b"> Give up quickly when something is hard.</label>
+      <div id="qf5" class="feedback"></div>
+      <div id="qh5" class="tiny"></div>
+    </div>
+
+    <button onclick="checkComprehension()">Check Part 3 ✅</button>
+    <button class="secondary" onclick="resetComprehension()">Reset Part 3 🔄</button>
+
+    <div class="scoreline">Score: <span id="compScore">0/5</span></div>
+  </div>
+
   <div class="footer">
-    Practice makes you a stronger reader.
+    Great work. Practice makes you a stronger reader.
   </div>
 
 </div>
 
 <script>
 /* =========================================================
-   GA4 – The Crow and the Jug
-   Part 1: Click-to-unscramble in context
-   Includes per-word reset + reset all
-   Words: journey, desert, exhausted, dazzling, refreshed,
-          drop, soar, come up with, locate, narrow
+   UTILITIES
    ========================================================= */
-
 const SPACE_TILE = "␠";
 
 function shuffle(arr){
@@ -165,7 +254,6 @@ function normalize(s){
   return s.replace(/\s+/g," ").trim().toLowerCase();
 }
 
-// Build letter tiles from the target word/phrase (includes spaces)
 function lettersFromWord(word){
   const letters = [];
   for(const ch of word.toLowerCase()){
@@ -175,98 +263,121 @@ function lettersFromWord(word){
   return shuffle(letters);
 }
 
-// Your 10 items (meaning + context sentence)
+/* =========================================================
+   PART 1: UNSCRAMBLE (20 seconds per word + per-word reset)
+   ========================================================= */
+const TIME_PER_WORD = 20; // seconds
+
 const spellingWords = [
-  {
-    word:"journey",
-    meaning:"a long trip (noun)",
-    sentence:"The crow was on a long ______ across the land."
-  },
-  {
-    word:"desert",
-    meaning:"a hot, dry place with sand (noun)",
-    sentence:"He landed in a ______ with no water."
-  },
-  {
-    word:"exhausted",
-    meaning:"very tired (adjective)",
-    sentence:"After flying all day, he felt ______."
-  },
-  {
-    word:"dazzling",
-    meaning:"very bright (adjective)",
-    sentence:"The sun was ______ in the sky."
-  },
-  {
-    word:"refreshed",
-    meaning:"feeling better after rest or a drink (adjective)",
-    sentence:"After drinking, the crow felt ______."
-  },
-  {
-    word:"drop",
-    meaning:"to let something fall (verb)",
-    sentence:"He would ______ small stones into the jug."
-  },
-  {
-    word:"soar",
-    meaning:"to fly high in the sky (verb)",
-    sentence:"Finally, he spread his wings and began to ______."
-  },
-  {
-    word:"come up with",
-    meaning:"to think of an idea (phrase)",
-    sentence:"The crow stopped and thought. Then he ______ an idea."
-  },
-  {
-    word:"locate",
-    meaning:"to find (verb)",
-    sentence:"He could not ______ any water at first."
-  },
-  {
-    word:"narrow",
-    meaning:"not wide (adjective)",
-    sentence:"The jug opening was too ______ for his head."
-  }
-].map(item => ({
-  ...item,
-  letters: lettersFromWord(item.word)
+  { word:"journey", meaning:"a long trip (noun)", sentence:"The crow was on a long ______ across the land." },
+  { word:"desert", meaning:"a hot, dry place with sand (noun)", sentence:"He landed in a ______ with no water." },
+  { word:"exhausted", meaning:"very tired (adjective)", sentence:"After flying all day, he felt ______." },
+  { word:"dazzling", meaning:"very bright (adjective)", sentence:"The sun was ______ in the sky." },
+  { word:"refreshed", meaning:"feeling better after rest or a drink (adjective)", sentence:"After drinking, the crow felt ______." },
+  { word:"drop", meaning:"to let something fall (verb)", sentence:"He would ______ small stones into the jug." },
+  { word:"soar", meaning:"to fly high in the sky (verb)", sentence:"Finally, he spread his wings and began to ______." },
+  { word:"come up with", meaning:"to think of an idea (phrase)", sentence:"The crow stopped and thought. Then he ______ an idea." },
+  { word:"locate", meaning:"to find (verb)", sentence:"He could not ______ any water at first." },
+  { word:"narrow", meaning:"not wide (adjective)", sentence:"The jug opening was too ______ for his head." }
+].map(item => ({ ...item, letters: lettersFromWord(item.word) }));
+
+const spellingList = document.getElementById("spellingList");
+
+// timer state per row
+const rowState = spellingWords.map(() => ({
+  timeLeft: TIME_PER_WORD,
+  intervalId: null,
+  locked: false
 }));
 
-const list = document.getElementById("spellingList");
+function renderSpelling(){
+  spellingList.innerHTML = "";
+  spellingWords.forEach((item,i)=>{
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div><strong>${item.meaning}</strong></div>
+      <div class="note" style="margin:8px 0 8px 0;">
+        ${item.sentence.replace("______","<b>______</b>")}
+      </div>
 
-// Render items
-spellingWords.forEach((item,i)=>{
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <div><strong>${item.meaning}</strong></div>
-    <div class="note" style="margin:8px 0 8px 0;">
-      ${item.sentence.replace("______","<b>______</b>")}
-    </div>
+      <div class="tiles" id="tiles${i}"></div>
+      <div class="answerBox" id="ans${i}"></div>
 
-    <div class="tiles" id="tiles${i}"></div>
-    <div class="answerBox" id="ans${i}"></div>
+      <div class="rowBtns">
+        <span class="timerPill" id="timer${i}">Timer: ${TIME_PER_WORD}s</span>
+        <button class="ghost small" onclick="resetOne(${i})">Reset this word</button>
+        <span id="fb${i}" class="feedback"></span>
+      </div>
+    `;
+    spellingList.appendChild(li);
 
-    <div class="rowBtns">
-      <button class="ghost small" onclick="resetOne(${i})">Reset this word</button>
-      <span id="fb${i}" class="feedback"></span>
-    </div>
-  `;
-  list.appendChild(li);
+    const tiles = document.getElementById("tiles"+i);
+    item.letters.forEach(l=>{
+      const span = document.createElement("span");
+      span.className = "tile";
+      span.textContent = (l===SPACE_TILE) ? "␠" : l;
+      span.dataset.letter = l;
+      span.onclick = () => toggleLetter(span,i);
+      tiles.appendChild(span);
+    });
 
-  const tiles = document.getElementById("tiles"+i);
-
-  item.letters.forEach(l=>{
-    const span = document.createElement("span");
-    span.className = "tile";
-    span.textContent = (l===SPACE_TILE) ? "␠" : l;
-    span.dataset.letter = l;
-    span.onclick = () => toggleLetter(span,i);
-    tiles.appendChild(span);
+    // start timer for each row after render
+    startRowTimer(i);
   });
-});
+}
 
-// Click tiles to build answer
+function lockRow(i){
+  rowState[i].locked = true;
+  document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>{
+    t.classList.add("locked");
+    t.onclick = null;
+  });
+}
+
+function unlockRow(i){
+  rowState[i].locked = false;
+  const item = spellingWords[i];
+  document.querySelectorAll(`#tiles${i} .tile`).forEach((t, idx)=>{
+    t.classList.remove("locked");
+    // rebind click handler
+    t.onclick = () => toggleLetter(t, i);
+  });
+}
+
+function startRowTimer(i){
+  // clear existing
+  if(rowState[i].intervalId) clearInterval(rowState[i].intervalId);
+
+  rowState[i].timeLeft = TIME_PER_WORD;
+  rowState[i].locked = false;
+
+  const timerEl = document.getElementById("timer"+i);
+  if(timerEl) timerEl.textContent = `Timer: ${rowState[i].timeLeft}s`;
+
+  rowState[i].intervalId = setInterval(()=>{
+    rowState[i].timeLeft--;
+    const t = rowState[i].timeLeft;
+    const el = document.getElementById("timer"+i);
+    if(el) el.textContent = `Timer: ${Math.max(t,0)}s`;
+
+    if(t <= 0){
+      clearInterval(rowState[i].intervalId);
+      rowState[i].intervalId = null;
+      lockRow(i);
+
+      const fb = document.getElementById("fb"+i);
+      fb.textContent = "Time’s up";
+      fb.className = "feedback warn";
+    }
+  }, 1000);
+
+  // ensure tiles are clickable
+  unlockRow(i);
+}
+
 function toggleLetter(tile,i){
+  if(rowState[i].locked) return;
+
   const box = document.getElementById("ans"+i);
   const letter = tile.dataset.letter;
 
@@ -284,7 +395,6 @@ function toggleLetter(tile,i){
   }
 }
 
-// Check all answers
 function checkSpelling(){
   let score = 0;
   spellingWords.forEach((item,i)=>{
@@ -297,27 +407,173 @@ function checkSpelling(){
       fb.className = "feedback good";
       score++;
     }else{
-      fb.textContent = "✖";
-      fb.className = "feedback bad";
+      // if time was up, keep warn; otherwise mark incorrect
+      if(!fb.classList.contains("warn")){
+        fb.textContent = "✖";
+        fb.className = "feedback bad";
+      }
     }
   });
   document.getElementById("spellScore").textContent = score + "/10";
 }
 
-// Reset one item
 function resetOne(i){
+  // clear answer + feedback + tiles
   document.getElementById("ans"+i).textContent = "";
   const fb = document.getElementById("fb"+i);
   fb.textContent = "";
   fb.className = "feedback";
   document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
+
+  // restart timer + unlock
+  startRowTimer(i);
 }
 
-// Reset all
 function resetSpelling(){
-  spellingWords.forEach((_,i)=>resetOne(i));
+  // reset all rows
+  spellingWords.forEach((_,i)=>{
+    document.getElementById("ans"+i).textContent = "";
+    const fb = document.getElementById("fb"+i);
+    fb.textContent = "";
+    fb.className = "feedback";
+    document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
+    startRowTimer(i);
+  });
   document.getElementById("spellScore").textContent = "0/10";
 }
+
+/* =========================================================
+   PART 2: VOCAB IN CONTEXT (dropdown)
+   ========================================================= */
+const ctxWords = [
+  "journey","desert","exhausted","dazzling","refreshed",
+  "drop","soar","come up with","locate","narrow"
+];
+
+// Build context questions (10)
+const contextItems = [
+  { ans:"journey", sentence:"The crow flew for days. It was a long ______." },
+  { ans:"desert", sentence:"There were no trees or water. It was a ______." },
+  { ans:"exhausted", sentence:"He could hardly move. He was ______." },
+  { ans:"dazzling", sentence:"The sun was so bright it hurt his eyes — it was ______." },
+  { ans:"refreshed", sentence:"After drinking the water, he felt ______." },
+  { ans:"drop", sentence:"He had to ______ stones into the jug one by one." },
+  { ans:"soar", sentence:"When he had energy again, he could ______ into the sky." },
+  { ans:"come up with", sentence:"He stopped and thought, then he ______ an idea." },
+  { ans:"locate", sentence:"He tried to ______ water, but he couldn’t find any." },
+  { ans:"narrow", sentence:"The opening was too ______, so his beak couldn’t reach." }
+];
+
+const contextList = document.getElementById("contextList");
+
+function renderContext(){
+  contextList.innerHTML = "";
+  contextItems.forEach((it, idx)=>{
+    const li = document.createElement("li");
+    const selId = `c${idx+1}`;
+    const fbId = `cf${idx+1}`;
+
+    // build options: correct + 3 distractors
+    const pool = ctxWords.filter(w => w !== it.ans);
+    const distractors = shuffle(pool).slice(0,3);
+    const options = shuffle([it.ans, ...distractors]);
+
+    li.innerHTML = `
+      ${it.sentence.replace("______","<b>______</b>")}
+      <div style="margin-top:8px;">
+        <select id="${selId}">
+          <option value=""></option>
+          ${options.map(o => `<option value="${o}">${o}</option>`).join("")}
+        </select>
+        <span id="${fbId}" class="feedback"></span>
+      </div>
+    `;
+    contextList.appendChild(li);
+  });
+}
+
+function checkContext(){
+  let score = 0;
+  contextItems.forEach((it, i)=>{
+    const fb = document.getElementById("cf"+(i+1));
+    const val = document.getElementById("c"+(i+1)).value;
+    if(val === it.ans){
+      fb.textContent = "✔";
+      fb.className = "feedback good";
+      score++;
+    }else{
+      fb.textContent = "✖";
+      fb.className = "feedback bad";
+    }
+  });
+  document.getElementById("ctxScore").textContent = score + "/10";
+}
+
+function resetContext(){
+  contextItems.forEach((_,i)=>{
+    document.getElementById("c"+(i+1)).value = "";
+    const fb = document.getElementById("cf"+(i+1));
+    fb.textContent = "";
+    fb.className = "feedback";
+  });
+  document.getElementById("ctxScore").textContent = "0/10";
+}
+
+/* =========================================================
+   PART 3: COMPREHENSION (5 questions + tips)
+   ========================================================= */
+const compAnswers = {
+  q1:{ correct:"a", help:"Tip: At the start, the crow lands in a place with sand and no water." },
+  q2:{ correct:"a", help:"Tip: The water is at the bottom and the opening is too narrow." },
+  q3:{ correct:"b", help:"Tip: He uses small stones to raise the water level." },
+  q4:{ correct:"a", help:"Tip: As stones fill the jug, the water rises." },
+  q5:{ correct:"a", help:"Tip: The crow solves the problem by thinking and trying a smart plan." }
+};
+
+function getRadioValue(name){
+  const r = document.getElementsByName(name);
+  for(const i of r){ if(i.checked) return i.value; }
+  return "";
+}
+
+function checkComprehension(){
+  let score = 0;
+  Object.keys(compAnswers).forEach((q, i)=>{
+    const chosen = getRadioValue(q);
+    const fb = document.getElementById("qf"+(i+1));
+    const hint = document.getElementById("qh"+(i+1));
+
+    if(chosen === compAnswers[q].correct){
+      fb.textContent = "✔";
+      fb.className = "feedback good";
+      hint.textContent = "";
+      score++;
+    }else{
+      fb.textContent = "✖";
+      fb.className = "feedback bad";
+      hint.textContent = compAnswers[q].help;
+    }
+  });
+  document.getElementById("compScore").textContent = score + "/5";
+}
+
+function resetComprehension(){
+  Object.keys(compAnswers).forEach((q, i)=>{
+    document.getElementsByName(q).forEach(r => r.checked = false);
+    const fb = document.getElementById("qf"+(i+1));
+    const hint = document.getElementById("qh"+(i+1));
+    fb.textContent = "";
+    fb.className = "feedback";
+    hint.textContent = "";
+  });
+  document.getElementById("compScore").textContent = "0/5";
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+renderSpelling();
+renderContext();
 </script>
 
 </body>
