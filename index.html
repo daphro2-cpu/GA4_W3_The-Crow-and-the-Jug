@@ -1,235 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GA4 • Reading Vocab • Unscramble in Context</title>
-  <style>
-    :root{
-      --bg:#0f172a;
-      --panel:#111c33;
-      --card:#0b1226;
-      --ink:#e5e7eb;
-      --muted:#9ca3af;
-      --line:#24324f;
-      --good:#22c55e;
-      --bad:#ef4444;
-      --warn:#f59e0b;
-      --accent:#60a5fa;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:"Century Gothic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 20% 10%, #1a2a55 0%, var(--bg) 60%);
-      color:var(--ink);
-    }
-    .wrap{max-width:980px;margin:0 auto;padding:18px 14px 40px}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>The Crow and the Jug – Online Practice</title>
 
-    header{
-      display:flex;gap:12px;align-items:flex-start;justify-content:space-between;
-      border:1px solid var(--line);
-      background: linear-gradient(180deg, rgba(96,165,250,.15), rgba(96,165,250,.04));
-      padding:14px;border-radius:14px;
-    }
-    .brand{display:flex;gap:12px;align-items:center;min-width:0}
-    .logo{
-      width:56px;height:56px;object-fit:contain;border-radius:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(11,18,38,.55);
-      padding:6px;flex:0 0 auto;
-    }
-    h1{margin:0;font-size:18px;letter-spacing:.2px}
-    .sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.35}
+<style>
+body{
+  font-family:"Century Gothic", Arial, sans-serif;
+  background:#f6f7fb;
+  margin:0;
+  padding:20px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{
+  display:flex;align-items:center;gap:16px;
+  background:#ffffff;padding:14px 16px;
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  margin-bottom:20px;
+}
+.header img{height:60px;}
+h1{margin:0;color:#5a3fa3;}
+.sub{font-size:14px;color:#444;}
 
-    .meta{display:flex;flex-direction:column;gap:8px;align-items:flex-end;min-width:240px}
-    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .pill{
-      font-size:12px;border:1px solid var(--line);background: rgba(17,28,51,.7);
-      padding:6px 10px;border-radius:999px;user-select:none;
-    }
-    .pill b{color:#fff}
-    .bar{
-      width:240px;height:10px;background: rgba(255,255,255,.07);
-      border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10);
-    }
-    .bar>div{
-      height:100%;width:0%;
-      background: linear-gradient(90deg, #60a5fa, #34d399);
-      transition: width .25s ease;
-    }
+.box{
+  background:#ffffff;
+  padding:16px;
+  margin-bottom:20px;
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+h2{color:#5a3fa3;margin-top:0;}
+.note{
+  background:#f0edff;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+  border:1px solid rgba(90,63,163,.25);
+}
 
-    main{margin-top:14px;display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
-    @media (max-width: 860px){
-      main{grid-template-columns:1fr}
-      .meta{align-items:flex-start;min-width:0}
-      .pillrow{justify-content:flex-start}
-      .bar{width:100%}
-    }
+.tiles{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.tile{
+  background:#5a3fa3;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:700;
+  user-select:none;
+}
+.tile.used{opacity:.4;}
 
-    .panel{
-      border:1px solid var(--line);
-      background: rgba(17,28,51,.55);
-      border-radius:14px;
-      padding:12px;
-    }
-    .panel h2{
-      margin:0 0 10px;font-size:14px;color:#fff;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-    }
-    .tag{
-      font-size:12px;color:var(--muted);
-      border:1px solid var(--line);
-      background: rgba(11,18,38,.7);
-      padding:4px 8px;border-radius:999px;
-    }
+.answerBox{
+  margin-top:6px;
+  min-height:32px;
+  padding:6px 10px;
+  border:2px dashed #bbb;
+  border-radius:8px;
+  font-weight:700;
+  background:#fff;
+}
 
-    .card{
-      border:1px solid var(--line);
-      background: rgba(11,18,38,.7);
-      border-radius:14px;
-      padding:14px;
-    }
-    .qtype{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .prompt{font-size:16px;line-height:1.35;margin:0 0 10px}
-    .sentence{
-      font-size:14px;color:var(--ink);
-      border-left:3px solid rgba(96,165,250,.5);
-      padding-left:10px;margin:8px 0 10px;line-height:1.55;
-    }
-    .help{
-      color:var(--muted);
-      font-size:13px;
-      margin:6px 0 10px;
-      line-height:1.45;
-    }
+.feedback{margin-left:8px;font-weight:800;}
+.good{color:#138a36;}
+.bad{color:#b00020;}
 
-    .answerBox{
-      border:1px dashed rgba(255,255,255,.18);
-      border-radius:12px;
-      padding:10px;
-      min-height:46px;
-      display:flex;flex-wrap:wrap;gap:8px;align-items:center;
-      background: rgba(11,18,38,.45);
-    }
-    .ghost{color: rgba(156,163,175,.85);font-size:13px}
+button{
+  padding:8px 14px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:#5a3fa3;
+  color:#fff;
+  cursor:pointer;
+  font-weight:700;
+}
+button.secondary{background:#333;}
+button.ghost{
+  background:transparent;
+  color:#5a3fa3;
+  border:2px solid #5a3fa3;
+}
+select{padding:6px;border-radius:6px;}
 
-    .tileRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .tile{
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(31,42,68,.7);
-      padding:8px 10px;border-radius:999px;
-      cursor:pointer;user-select:none;font-size:14px;
-      transition: transform .05s ease, border-color .2s ease;
-    }
-    .tile:hover{border-color: rgba(96,165,250,.55)}
-    .tile:active{transform: translateY(1px)}
-    .tile.selected{
-      border-color: rgba(34,197,94,.7);
-      background: rgba(34,197,94,.18);
-    }
-    .tile.disabled{
-      opacity:.55;
-      cursor:not-allowed;
-    }
+hr{border:none;border-top:1px solid #eee;margin:14px 0;}
 
-    .feedback{
-      margin-top:10px;
-      font-size:13px;color:var(--muted);
-      line-height:1.4;
-      min-height: 22px;
-    }
-    .feedback b{color:#fff}
-    .feedback .good{color: var(--good)}
-    .feedback .bad{color: var(--bad)}
-    .feedback .hint{color: #cbd5e1}
+.qblock{
+  background:#fafafe;
+  border:1px solid #ececf5;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:12px;
+}
+.tiny{font-size:13px;color:#555;margin-top:6px;}
 
-    .controls{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    button.smallbtn{
-      width:auto;
-      border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(34,211,238,.20), rgba(31,42,68,.65));
-      color:var(--ink);
-      border-radius:12px;
-      padding:10px 12px;
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
-    }
-    button.smallbtn.secondary{
-      background: linear-gradient(180deg, rgba(96,165,250,.12), rgba(31,42,68,.65));
-      border-color: rgba(96,165,250,.25);
-    }
-    button.smallbtn[disabled]{opacity:.55;cursor:not-allowed}
+.footer{
+  text-align:center;
+  font-size:12px;
+  color:#666;
+  margin-top:20px;
+}
 
-    .note{
-      font-size:12.5px;color:var(--muted);line-height:1.4;
-      border-left:3px solid rgba(245,158,11,.55);padding-left:10px;
-    }
-
-    .done{
-      display:none;margin-top:10px;padding:12px;border-radius:14px;
-      border:1px solid rgba(34,197,94,.35);
-      background: rgba(34,197,94,.10);
-    }
-    .done h3{margin:0 0 6px;font-size:15px}
-    .done p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
-
-    .reviewBox{
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(11,18,38,.55);
-      border-radius:12px;
-      padding:10px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-    .chip{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(31,42,68,.55);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12.5px;
-      color: var(--ink);
-    }
-
-    .timerPill{
-      border:1px solid rgba(245,158,11,.35);
-      background: rgba(245,158,11,.10);
-      color: #fde68a;
-    }
-    .timerPill b{color:#fff}
-  </style>
+.hidden{display:none;}
+.scoreline{font-weight:700;margin-top:8px;}
+.small{font-size:13px;color:#555;}
+</style>
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <img src="logo.png" alt="Logo" class="logo" />
-        <div>
-          <h1>GA4 • Vocab Unscramble in Context</h1>
-          <div class="sub">
-            Click the letters (or words) to fill the blank.<br/>
-            You have <b>20 seconds</b> for each one.
-          </div>
-        </div>
-      </div>
+<div class="container">
 
-      <div class="meta">
-        <div class="pillrow">
-          <div class="pill"><b>Progress</b> <span id="progTxt">0/0</span></div>
-          <div class="pill"><b>Score</b> <span id="scoreTxt">0</span></div>
-          <div class="pill timerPill"><b>Timer</b> <span id="qTimeTxt">20</span>s</div>
-        </div>
-        <div class="bar"><div id="progBar"></div></div>
-      </div>
-    </header>
+<!-- HEADER -->
+<div class="header">
+  <img src="logo.png" alt="School Logo">
+  <div>
+    <h1>The Crow and the Jug</h1>
+    <div class="sub">Online Reading & Vocabulary Practice</div>
+  </div>
+</div>
 
-    <main>
-      <section class="panel">
-        <h2>
-          <span id="sectionTitle">Unscramble</span>
-          <span class="tag" id="sectionTag">Click
+<!-- INTRO -->
+<div class="box">
+  <div class="note">
+    Try your best. Click the letters to build the word.  
+    If you make a mistake, reset and try again.
+  </div>
+</div>
+
+<!-- PART 1: UNSCRAMBLE -->
+<div class="box">
+<h2>Part 1: Spelling Practice (Click to Unscramble)</h2>
+<p class="small">All words are from today’s vocabulary list.</p>
+
+<ol id="spellingList"></ol>
+
+<button onclick="checkSpelling()">Check Part 1 ✅</button>
+<button class="secondary" onclick="resetSpelling()">Reset 🔄</button>
+
+<div class="scoreline">Score: <span id="spellScore">0/11</span> ⭐</div>
+
+<hr>
+
+<button class="ghost" id="challengeBtn" onclick="toggleChallenge()">Try a challenge (optional)</button>
+
+<div id="challengeArea" class="hidden">
+  <div class="note" style="margin-top:12px;">
+    Challenge word (optional): This word is <strong>NOT</strong> on your vocabulary list.  
+    Try it only if you want extra practice.
+  </div>
+
+  <ol id="bonusList"></ol>
+
+  <button onclick="checkBonus()">Check Challenge ✅</button>
+  <button class="secondary" onclick="resetBonus()">Reset Challenge 🔄</button>
+</div>
+
+</div>
+
+<!-- PART 2: CONTEXT -->
+<div class="box">
+<h2>Part 2: Vocabulary in Context</h2>
+<p>Choose the best word to complete each sentence.</p>
+
+<ol>
+  <li>The crow was on a long ______ across the land.
+    <select id="c1"><option></option><option>journey</option><option>jug</option><option>shade</option></select>
+    <span id="cf1" class="feedback"></span>
+  </li>
+
+  <li>He landed in a hot ______ with no water.
+    <select id="c2"><option></option><option>desert</option><option>journey</option><option>shadow</option></select>
+    <span id="cf2" class="feedback"></span>
+  </li>
+
+  <li>After flying all day, he was ______ and needed rest.
+    <select id="c3"><option></option><option>dazzling</option><option>exhausted</option><option>narrow</option></select>
+    <span id="cf3" class="feedback"></span>
+  </li>
+
+  <li>The sun was ______, so it was hard to look at it.
+    <select id="c4"><option></option><option>dazzling</option><option>refreshed</option><option>locate</option></select>
+    <span id="cf4" class="feedback"></span>
+  </li>
+
+  <li>The crow tried to ______ water, but he couldn’t find any.
+    <select id="c5"><option></option><option>locate</option><option>soar</option><option>drop</option></select>
+    <span id="cf5" class="feedback"></span>
+  </li>
+
+  <li>The jug opening was too ______ for the crow’s beak to fit.
+    <select id="c6"><option></option><option>narrow</option><option>refreshed</option><option>desert</option></select>
+    <span id="cf6" class="feedback"></span>
+  </li>
+
+  <li>He began to ______ small stones into the jug.
+    <select id="c7"><option></option><option>drop</option><option>soar</option><option>locate</option></select>
+    <span id="cf7" class="feedback"></span>
+  </li>
+
+  <li>Finally, he could drink and felt ______.
+    <select id="c8"><option></option><option>refreshed</option><option>dazzling</option><option>narrow</option></select>
+    <span id="cf8" class="feedback"></span>
+  </li>
+
+  <li>He spread his wings and ______ away into the sky.
+    <select id="c9"><option></option><option>soar</option><option>drop</option><option>journey</option></select>
+    <span id="cf9" class="feedback"></span>
+  </li>
+
+  <li>He stopped and thought until he could ______ an idea.
+    <select id="c10"><option></option><option>come up with</option><option>refreshed</option><option>desert</option></select>
+    <span id="cf10" class="feedback"></span>
+  </li>
+</ol>
+
+<button onclick="checkContext()">Check Part 2 ✅</button>
+<button class="secondary" onclick="resetContext()">Reset 🔄</button>
+</div>
+
+<!-- PART 3: COMPREHENSION -->
+<div class="box">
+<h2>Part 3: Reading Comprehension</h2>
+<p>Choose the best answer. If you make a mistake, read the tip and try again.</p>
+
+<div class="qblock">
+<strong>1) Where did the crow land?</strong><br>
+<label><input type="radio" name="q1" value="a"> In a desert.</label><br>
+<label><input type="radio" name="q1" value="b"> In a forest.</label>
+<div id="qf1" class="feedback"></div>
+<div id="qh1" class="tiny"></div>
+</div>
+
+<div class="qblock">
+<strong>2) Why couldn’t the crow drink the water at first?</strong><br>
+<label><input type="radio" name="q2" value="a"> The jug was too narrow.</label><br>
+<label><input type="radio" name="q2" value="b"> The water was frozen.</label>
+<div id="qf2" class="feedback"></div>
+<div id="qh2" class="tiny"></div>
+</div>
+
+<div class="qblock">
+<strong>3) What did the crow do with the stones?</strong><br>
+<label><input type="radio" name="q3" value="a"> He dropped them into the jug.</label><br>
+<label><input type="radio" name="q3" value="b"> He threw them far away.</label>
+<div id="qf3" class="feedback"></div>
+<div id="qh3" class="tiny"></div>
+</div>
+
+<div class="qblock">
+<strong>4) What happened to the water level?</strong><br>
+<label><input type="radio" name="q4" value="a"> It rose higher.</label><br>
+<label><input type="radio" name="q4" value="b"> It disappeared.</label>
+<div id="qf4" class="feedback"></div>
+<div id="qh4" class="tiny"></div>
+</div>
+
+<div class="qblock">
+<strong>5) What lesson does the story teach?</strong><br>
+<label><input type="radio" name="q5" value="a"> Use your brain to solve problems.</label><br>
+<label><input type="radio" name="q5" value="b"> Always give up quickly.</label>
+<div id="qf5" class="feedback"></div>
+<div id="qh5" class="tiny"></div>
+</div>
+
+<button onclick="checkComprehension()">Check Part 3 ✅</button>
+<button class="secondary" onclick="resetComprehension()">Reset 🔄</button>
+
+<div class="scoreline">Score: <span id="compScore">0/5</span></div>
+</div>
+
+<div class="footer">
+Great work. Practice makes you a stronger reader.
+</div>
+
+</div>
+
+<script>
+/* =========================================================
+   PART 1: CLICK-TO-UNSCRAMBLE (11 words)
+   ========================================================= */
+const SPACE_TILE = "␠";
+
+const spellingWords = [
+  {word:"journey", letters:["n","r","j","o","u","e","y"], meaning:"a long trip (noun)"},
+  {word:"desert", letters:["s","e","d","r","t","e"], meaning:"a hot, dry place with sand (noun)"},
+  {word:"jug", letters:["u","g","j"], meaning:"a container for water (noun)"},
+  {word:"exhausted", letters:["t","e","u","s","x","e","d","a","h","u","o"], meaning:"very tired (adjective)"},
+  {word:"dazzling", letters:["z","d","a","z","l","i","n","g"], meaning:"very bright (adjective)"},
+  {word:"refreshed", letters:["e","r","f","e","s","h","d","r","e"], meaning:"feeling better again (adjective)"},
+  {word:"drop", letters:["p","d","r","o"], meaning:"let something fall (verb)"},
+  {word:"soar", letters:["a","s","o","r"], meaning:"fly high (verb)"},
+  {word:"locate", letters:["l","a","t","e","o","c"], meaning:"find (verb)"},
+  {word:"narrow", letters:["r","a","n","w","r","o"], meaning:"not wide (adjective)"},
+  {word:"come up with", letters:["c","o","m","e",SPACE_TILE,"u","p",SPACE_TILE,"w","i","t","h"], meaning:"think of an idea (phrase)"}
+];
+
+const list = document.getElementById("spellingList");
+
+spellingWords.forEach((item,i)=>{
+  const li=document.createElement("li");
+  li.innerHTML=`
+    <strong>${item.meaning}</strong>
+    <div class="tiles" id="tiles${i}"></div>
+    <div class="answerBox" id="ans${i}"></div>
+    <span id="fb${i}" class="feedback"></span>
+  `;
+  list.appendChild(li);
+
+  const tiles=document.getElementById("tiles"+i);
+
+  item.letters.forEach(l=>{
+    const span=document.createElement("span");
+    span.className="tile";
+    span.textContent = (l===SPACE_TILE) ? "␠" : l;
+    span.dataset.letter = l;
+    span.onclick=()=>toggleLetter(span,i);
+    tiles.appendChild(span);
+  });
+});
+
+function toggleLetter(tile,i){
+  const box=document.getElementById("ans"+i);
+  const letter = tile.dataset.letter;
+
+  if(tile.classList.contains("used")){
+    tile.classList.remove("used");
+    const current = box.textContent;
+    const targetChar = (letter===SPACE_TILE) ? " " : letter;
+    const idx = current.indexOf(targetChar);
+    if(idx !== -1){
+      box.textContent = current.slice(0, idx) + current.slice(idx+1);
+    }
+  }else{
+    tile.classList.add("used");
+    box.textContent += (letter===SPACE_TILE) ? " " : letter;
+  }
+}
+
+function normalize(s){
+  return s.replace(/\s+/g," ").trim().toLowerCase();
+}
+
+function checkSpelling(){
+  let score=0;
+  spellingWords.forEach((item,i)=>{
+    const ans = normalize(document.getElementById("ans"+i).textContent);
+    const correct = normalize(item.word);
+    const fb=document.getElementById("fb"+i);
+
+    if(ans===correct){
+      fb.textContent="✔";
+      fb.className="feedback good";
+      score++;
+    }else{
+      fb.textContent="✖";
+      fb.className="feedback bad";
+    }
+  });
+  document.getElementById("spellScore").textContent=score+"/11";
+}
+
+function resetSpelling(){
+  spellingWords.forEach((_,i)=>{
+    document.getElementById("ans"+i).textContent="";
+    document.getElementById("fb"+i).textContent="";
+    document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
+  });
+  document.getElementById("spellScore").textContent="0/11";
+}
+
+/* =========================================================
+   CHALLENGE WORD (optional): clearly not on vocab sheet
+   ========================================================= */
+const bonusWords = [
+  {word:"oppressive", letters:["p","p","o","r","e","s","s","i","v","e"], meaning:"oppressive = very hot and heavy (NOT on this week’s vocab list)"}
+];
+
+const bonusList = document.getElementById("bonusList");
+
+bonusWords.forEach((item,i)=>{
+  const li=document.createElement("li");
+  li.innerHTML=`
+    <strong>${item.meaning}</strong>
+    <div class="tiles" id="btiles${i}"></div>
+    <div class="answerBox" id="bans${i}"></div>
+    <span id="bfb${i}" class="feedback"></span>
+  `;
+  bonusList.appendChild(li);
+
+  const tiles=document.getElementById("btiles"+i);
+  item.letters.forEach(l=>{
+    const span=document.createElement("span");
+    span.className="tile";
+    span.textContent=l;
+    span.onclick=()=>toggleBonus(span,i);
+    tiles.appendChild(span);
+  });
+});
+
+function toggleBonus(tile,i){
+  const box=document.getElementById("bans"+i);
+  if(tile.classList.contains("used")){
+    tile.classList.remove("used");
+    const current = box.textContent;
+    const idx = current.indexOf(tile.textContent);
+    if(idx !== -1){
+      box.textContent = current.slice(0, idx) + current.slice(idx+1);
+    }
+  }else{
+    tile.classList.add("used");
+    box.textContent += tile.textContent;
+  }
+}
+
+function checkBonus(){
+  bonusWords.forEach((item,i)=>{
+    const ans = normalize(document.getElementById("bans"+i).textContent);
+    const correct = normalize(item.word);
+    const fb = document.getElementById("bfb"+i);
+
+    if(ans===correct){
+      fb.textContent="✔";
+      fb.className="feedback good";
+    }else{
+      fb.textContent="✖";
+      fb.className="feedback bad";
+    }
+  });
+}
+
+function resetBonus(){
+  bonusWords.forEach((_,i)=>{
+    document.getElementById("bans"+i).textContent="";
+    document.getElementById("bfb"+i).textContent="";
+    document.querySelectorAll(`#btiles${i} .tile`).forEach(t=>t.classList.remove("used"));
+  });
+}
+
+function toggleChallenge(){
+  const area = document.getElementById("challengeArea");
+  const btn = document.getElementById("challengeBtn");
+  const isHidden = area.classList.contains("hidden");
+  if(isHidden){
+    area.classList.remove("hidden");
+    btn.textContent = "Hide challenge";
+  }else{
+    area.classList.add("hidden");
+    btn.textContent = "Try a challenge (optional)";
+  }
+}
+
+/* =========================================================
+   PART 2: CONTEXT (10 items)
+   ========================================================= */
+const ctxAns=[
+  "journey","desert","exhausted","dazzling","locate",
+  "narrow","drop","refreshed","soar","come up with"
+];
+
+function checkContext(){
+  ctxAns.forEach((a,i)=>{
+    const fb=document.getElementById("cf"+(i+1));
+    if(document.getElementById("c"+(i+1)).value===a){
+      fb.textContent="✔";
+      fb.className="feedback good";
+    }else{
+      fb.textContent="✖";
+      fb.className="feedback bad";
+    }
+  });
+}
+
+function resetContext(){
+  ctxAns.forEach((_,i)=>{
+    document.getElementById("c"+(i+1)).value="";
+    document.getElementById("cf"+(i+1)).textContent="";
+  });
+}
+
+/* =========================================================
+   PART 3: COMPREHENSION (5 questions + helpful tips)
+   ========================================================= */
+const compAnswers={
+  q1:{correct:"a",help:"Tip: The story says Crow landed in a desert with no water."},
+  q2:{correct:"a",help:"Tip: Crow cannot reach the water because the jug is narrow."},
+  q3:{correct:"a",help:"Tip: Crow drops stones into the jug one by one."},
+  q4:{correct:"a",help:"Tip: The stones make the water level rise higher."},
+  q5:{correct:"a",help:"Tip: The crow solves the problem by thinking carefully."}
+};
+
+function getRadioValue(name){
+  const r=document.getElementsByName(name);
+  for(let i of r){if(i.checked)return i.value;}
+  return "";
+}
+
+function checkComprehension(){
+  let score=0;
+  Object.keys(compAnswers).forEach((q,i)=>{
+    const chosen=getRadioValue(q);
+    const fb=document.getElementById("qf"+(i+1));
+    const hint=document.getElementById("qh"+(i+1));
+    if(chosen===compAnswers[q].correct){
+      fb.textContent="✔";
+      fb.className="feedback good";
+      hint.textContent="";
+      score++;
+    }else{
+      fb.textContent="✖";
+      fb.className="feedback bad";
+      hint.textContent=compAnswers[q].help;
+    }
+  });
+  document.getElementById("compScore").textContent=score+"/5";
+}
+
+function resetComprehension(){
+  Object.keys(compAnswers).forEach((q,i)=>{
+    document.getElementsByName(q).forEach(r=>r.checked=false);
+    document.getElementById("qf"+(i+1)).textContent="";
+    document.getElementById("qh"+(i+1)).textContent="";
+  });
+  document.getElementById("compScore").textContent="0/5";
+}
+</script>
+
+</body>
+</html>
+
