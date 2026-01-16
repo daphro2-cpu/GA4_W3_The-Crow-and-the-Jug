@@ -146,7 +146,7 @@
   <div class="box">
     <div class="note">
       <b>How to play:</b><br>
-      • Part 1: Read the clue. Click letters to build the missing word. You have <b>20 seconds</b> for each word.<br>
+      • Part 1: Read the definition. Click letters to build the word. You have <b>20 seconds</b> for each word.<br>
       • You can reset <b>each word</b> if you need to.<br>
       • Part 2: Choose the best word for each sentence.<br>
       • Part 3: Comprehension questions about the story.
@@ -265,20 +265,21 @@ function lettersFromWord(word){
 
 /* =========================================================
    PART 1: UNSCRAMBLE (20 seconds per word + per-word reset)
+   NOTE: Sentences removed here; only definition supports unscramble.
    ========================================================= */
 const TIME_PER_WORD = 20; // seconds
 
 const spellingWords = [
-  { word:"journey", meaning:"a long trip (noun)", sentence:"The crow was on a long ______ across the land." },
-  { word:"desert", meaning:"a hot, dry place with sand (noun)", sentence:"He landed in a ______ with no water." },
-  { word:"exhausted", meaning:"very tired (adjective)", sentence:"After flying all day, he felt ______." },
-  { word:"dazzling", meaning:"very bright (adjective)", sentence:"The sun was ______ in the sky." },
-  { word:"refreshed", meaning:"feeling better after rest or a drink (adjective)", sentence:"After drinking, the crow felt ______." },
-  { word:"drop", meaning:"to let something fall (verb)", sentence:"He would ______ small stones into the jug." },
-  { word:"soar", meaning:"to fly high in the sky (verb)", sentence:"Finally, he spread his wings and began to ______." },
-  { word:"come up with", meaning:"to think of an idea (phrase)", sentence:"The crow stopped and thought. Then he ______ an idea." },
-  { word:"locate", meaning:"to find (verb)", sentence:"He could not ______ any water at first." },
-  { word:"narrow", meaning:"not wide (adjective)", sentence:"The jug opening was too ______ for his head." }
+  { word:"journey", meaning:"a long trip (noun)" },
+  { word:"desert", meaning:"a hot, dry place with sand (noun)" },
+  { word:"exhausted", meaning:"very tired (adjective)" },
+  { word:"dazzling", meaning:"very bright (adjective)" },
+  { word:"refreshed", meaning:"feeling better after rest or a drink (adjective)" },
+  { word:"drop", meaning:"to let something fall (verb)" },
+  { word:"soar", meaning:"to fly high in the sky (verb)" },
+  { word:"come up with", meaning:"to think of an idea (phrase)" },
+  { word:"locate", meaning:"to find (verb)" },
+  { word:"narrow", meaning:"not wide (adjective)" }
 ].map(item => ({ ...item, letters: lettersFromWord(item.word) }));
 
 const spellingList = document.getElementById("spellingList");
@@ -296,9 +297,6 @@ function renderSpelling(){
     const li = document.createElement("li");
     li.innerHTML = `
       <div><strong>${item.meaning}</strong></div>
-      <div class="note" style="margin:8px 0 8px 0;">
-        ${item.sentence.replace("______","<b>______</b>")}
-      </div>
 
       <div class="tiles" id="tiles${i}"></div>
       <div class="answerBox" id="ans${i}"></div>
@@ -321,7 +319,6 @@ function renderSpelling(){
       tiles.appendChild(span);
     });
 
-    // start timer for each row after render
     startRowTimer(i);
   });
 }
@@ -336,16 +333,13 @@ function lockRow(i){
 
 function unlockRow(i){
   rowState[i].locked = false;
-  const item = spellingWords[i];
-  document.querySelectorAll(`#tiles${i} .tile`).forEach((t, idx)=>{
+  document.querySelectorAll(`#tiles${i} .tile`).forEach((t)=>{
     t.classList.remove("locked");
-    // rebind click handler
     t.onclick = () => toggleLetter(t, i);
   });
 }
 
 function startRowTimer(i){
-  // clear existing
   if(rowState[i].intervalId) clearInterval(rowState[i].intervalId);
 
   rowState[i].timeLeft = TIME_PER_WORD;
@@ -371,7 +365,6 @@ function startRowTimer(i){
     }
   }, 1000);
 
-  // ensure tiles are clickable
   unlockRow(i);
 }
 
@@ -407,7 +400,6 @@ function checkSpelling(){
       fb.className = "feedback good";
       score++;
     }else{
-      // if time was up, keep warn; otherwise mark incorrect
       if(!fb.classList.contains("warn")){
         fb.textContent = "✖";
         fb.className = "feedback bad";
@@ -418,19 +410,15 @@ function checkSpelling(){
 }
 
 function resetOne(i){
-  // clear answer + feedback + tiles
   document.getElementById("ans"+i).textContent = "";
   const fb = document.getElementById("fb"+i);
   fb.textContent = "";
   fb.className = "feedback";
   document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
-
-  // restart timer + unlock
   startRowTimer(i);
 }
 
 function resetSpelling(){
-  // reset all rows
   spellingWords.forEach((_,i)=>{
     document.getElementById("ans"+i).textContent = "";
     const fb = document.getElementById("fb"+i);
@@ -450,7 +438,6 @@ const ctxWords = [
   "drop","soar","come up with","locate","narrow"
 ];
 
-// Build context questions (10)
 const contextItems = [
   { ans:"journey", sentence:"The crow flew for days. It was a long ______." },
   { ans:"desert", sentence:"There were no trees or water. It was a ______." },
@@ -473,7 +460,6 @@ function renderContext(){
     const selId = `c${idx+1}`;
     const fbId = `cf${idx+1}`;
 
-    // build options: correct + 3 distractors
     const pool = ctxWords.filter(w => w !== it.ans);
     const distractors = shuffle(pool).slice(0,3);
     const options = shuffle([it.ans, ...distractors]);
