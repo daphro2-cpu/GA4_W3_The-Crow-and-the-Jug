@@ -133,7 +133,6 @@
 <body>
 <div class="container">
 
-  <!-- HEADER -->
   <div class="header">
     <img src="logo.png" alt="School Logo">
     <div>
@@ -142,18 +141,16 @@
     </div>
   </div>
 
-  <!-- INTRO -->
   <div class="box">
     <div class="note">
       <b>How to play:</b><br>
-      • Part 1: Read the clue. Click letters to build the missing word. You have <b>20 seconds</b> for each word.<br>
-      • You can reset <b>each word</b> if you need to.<br>
-      • Part 2: Choose the best word for each sentence.<br>
-      • Part 3: Comprehension questions about the story.
+      • Part 1: Read the definition. Click letters to build the word. You have <b>20 seconds</b> per word.<br>
+      • <b>The timer starts only when you click the first letter for THAT word.</b><br>
+      • If you get it wrong, you will see the <b>correct answer</b>.<br>
+      • You can reset each word to try again.
     </div>
   </div>
 
-  <!-- PART 1: UNSCRAMBLE -->
   <div class="box">
     <h2>Part 1: Spelling Practice (Click to Unscramble)</h2>
     <p>All words are from today’s vocabulary list.</p>
@@ -166,7 +163,6 @@
     <div class="scoreline">Score: <span id="spellScore">0/10</span></div>
   </div>
 
-  <!-- PART 2: CONTEXT -->
   <div class="box">
     <h2>Part 2: Vocabulary in Context</h2>
     <p>Choose the best word to complete each sentence.</p>
@@ -178,7 +174,6 @@
     <div class="scoreline">Score: <span id="ctxScore">0/10</span></div>
   </div>
 
-  <!-- PART 3: COMPREHENSION -->
   <div class="box">
     <h2>Part 3: Reading Comprehension</h2>
     <p>Choose the best answer. If you miss, read the tip and try again.</p>
@@ -249,11 +244,9 @@ function shuffle(arr){
   }
   return a;
 }
-
 function normalize(s){
   return s.replace(/\s+/g," ").trim().toLowerCase();
 }
-
 function lettersFromWord(word){
   const letters = [];
   for(const ch of word.toLowerCase()){
@@ -264,47 +257,112 @@ function lettersFromWord(word){
 }
 
 /* =========================================================
-   PART 1: UNSCRAMBLE (20 seconds per word + per-word reset)
+   PART 1: UNSCRAMBLE (timer starts on first click per row)
    ========================================================= */
-const TIME_PER_WORD = 20; // seconds
+const TIME_PER_WORD = 20;
 
 const spellingWords = [
-  { word:"journey", meaning:"a long trip (noun)", sentence:"The crow was on a long ______ across the land." },
-  { word:"desert", meaning:"a hot, dry place with sand (noun)", sentence:"He landed in a ______ with no water." },
-  { word:"exhausted", meaning:"very tired (adjective)", sentence:"After flying all day, he felt ______." },
-  { word:"dazzling", meaning:"very bright (adjective)", sentence:"The sun was ______ in the sky." },
-  { word:"refreshed", meaning:"feeling better after rest or a drink (adjective)", sentence:"After drinking, the crow felt ______." },
-  { word:"drop", meaning:"to let something fall (verb)", sentence:"He would ______ small stones into the jug." },
-  { word:"soar", meaning:"to fly high in the sky (verb)", sentence:"Finally, he spread his wings and began to ______." },
-  { word:"come up with", meaning:"to think of an idea (phrase)", sentence:"The crow stopped and thought. Then he ______ an idea." },
-  { word:"locate", meaning:"to find (verb)", sentence:"He could not ______ any water at first." },
-  { word:"narrow", meaning:"not wide (adjective)", sentence:"The jug opening was too ______ for his head." }
+  { word:"journey", meaning:"a long trip (noun)" },
+  { word:"desert", meaning:"a hot, dry place with sand (noun)" },
+  { word:"exhausted", meaning:"very tired (adjective)" },
+  { word:"dazzling", meaning:"very bright (adjective)" },
+  { word:"refreshed", meaning:"feeling better after rest or a drink (adjective)" },
+  { word:"drop", meaning:"to let something fall (verb)" },
+  { word:"soar", meaning:"to fly high in the sky (verb)" },
+  { word:"come up with", meaning:"to think of an idea (phrase)" },
+  { word:"locate", meaning:"to find (verb)" },
+  { word:"narrow", meaning:"not wide (adjective)" }
 ].map(item => ({ ...item, letters: lettersFromWord(item.word) }));
 
 const spellingList = document.getElementById("spellingList");
 
-// timer state per row
+/* State per word */
 const rowState = spellingWords.map(() => ({
   timeLeft: TIME_PER_WORD,
   intervalId: null,
-  locked: false
+  locked: false,
+  started: false
 }));
 
+/* SAFETY: clear any leftover intervals (helps with “old code” behavior) */
+function clearAllRowTimers(){
+  rowState.forEach((st) => {
+    if(st.intervalId){
+      clearInterval(st.intervalId);
+      st.intervalId = null;
+    }
+  });
+}
+
+function setTimerText(i){
+  const el = document.getElementById("timer"+i);
+  if(!el) return;
+  if(!rowState[i].started){
+    el.textContent = `Timer: ${TIME_PER_WORD}s (starts on first click)`;
+  }else{
+    el.textContent = `Timer: ${Math.max(rowState[i].timeLeft,0)}s`;
+  }
+}
+
+function lockRow(i){
+  rowState[i].locked = true;
+  document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>{
+    t.classList.add("locked");
+    t.onclick = null;
+  });
+}
+
+function unlockRow(i){
+  rowState[i].locked = false;
+  document.querySelectorAll(`#tiles${i} .tile`).forEach((t)=>{
+    t.classList.remove("locked");
+    t.onclick = () => toggleLetter(t, i);
+  });
+}
+
+function startRowTimer(i){
+  if(rowState[i].intervalId) clearInterval(rowState[i].intervalId);
+
+  rowState[i].started = true;
+  rowState[i].timeLeft = TIME_PER_WORD;
+  setTimerText(i);
+
+  rowState[i].intervalId = setInterval(()=>{
+    rowState[i].timeLeft--;
+    setTimerText(i);
+
+    if(rowState[i].timeLeft <= 0){
+      clearInterval(rowState[i].intervalId);
+      rowState[i].intervalId = null;
+      lockRow(i);
+
+      const fb = document.getElementById("fb"+i);
+      fb.textContent = "Time’s up";
+      fb.className = "feedback warn";
+    }
+  }, 1000);
+}
+
 function renderSpelling(){
+  clearAllRowTimers();
   spellingList.innerHTML = "";
+
   spellingWords.forEach((item,i)=>{
+    // reset state
+    rowState[i].timeLeft = TIME_PER_WORD;
+    rowState[i].locked = false;
+    rowState[i].started = false;
+    rowState[i].intervalId = null;
+
     const li = document.createElement("li");
     li.innerHTML = `
       <div><strong>${item.meaning}</strong></div>
-      <div class="note" style="margin:8px 0 8px 0;">
-        ${item.sentence.replace("______","<b>______</b>")}
-      </div>
 
       <div class="tiles" id="tiles${i}"></div>
       <div class="answerBox" id="ans${i}"></div>
 
       <div class="rowBtns">
-        <span class="timerPill" id="timer${i}">Timer: ${TIME_PER_WORD}s</span>
+        <span class="timerPill" id="timer${i}"></span>
         <button class="ghost small" onclick="resetOne(${i})">Reset this word</button>
         <span id="fb${i}" class="feedback"></span>
       </div>
@@ -321,62 +379,18 @@ function renderSpelling(){
       tiles.appendChild(span);
     });
 
-    // start timer for each row after render
-    startRowTimer(i);
+    setTimerText(i);
+    unlockRow(i);
   });
-}
-
-function lockRow(i){
-  rowState[i].locked = true;
-  document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>{
-    t.classList.add("locked");
-    t.onclick = null;
-  });
-}
-
-function unlockRow(i){
-  rowState[i].locked = false;
-  const item = spellingWords[i];
-  document.querySelectorAll(`#tiles${i} .tile`).forEach((t, idx)=>{
-    t.classList.remove("locked");
-    // rebind click handler
-    t.onclick = () => toggleLetter(t, i);
-  });
-}
-
-function startRowTimer(i){
-  // clear existing
-  if(rowState[i].intervalId) clearInterval(rowState[i].intervalId);
-
-  rowState[i].timeLeft = TIME_PER_WORD;
-  rowState[i].locked = false;
-
-  const timerEl = document.getElementById("timer"+i);
-  if(timerEl) timerEl.textContent = `Timer: ${rowState[i].timeLeft}s`;
-
-  rowState[i].intervalId = setInterval(()=>{
-    rowState[i].timeLeft--;
-    const t = rowState[i].timeLeft;
-    const el = document.getElementById("timer"+i);
-    if(el) el.textContent = `Timer: ${Math.max(t,0)}s`;
-
-    if(t <= 0){
-      clearInterval(rowState[i].intervalId);
-      rowState[i].intervalId = null;
-      lockRow(i);
-
-      const fb = document.getElementById("fb"+i);
-      fb.textContent = "Time’s up";
-      fb.className = "feedback warn";
-    }
-  }, 1000);
-
-  // ensure tiles are clickable
-  unlockRow(i);
 }
 
 function toggleLetter(tile,i){
   if(rowState[i].locked) return;
+
+  // Start timer ONLY when student first clicks a letter for THIS word
+  if(!rowState[i].started){
+    startRowTimer(i);
+  }
 
   const box = document.getElementById("ans"+i);
   const letter = tile.dataset.letter;
@@ -397,6 +411,7 @@ function toggleLetter(tile,i){
 
 function checkSpelling(){
   let score = 0;
+
   spellingWords.forEach((item,i)=>{
     const ans = normalize(document.getElementById("ans"+i).textContent);
     const correct = normalize(item.word);
@@ -407,50 +422,48 @@ function checkSpelling(){
       fb.className = "feedback good";
       score++;
     }else{
-      // if time was up, keep warn; otherwise mark incorrect
-      if(!fb.classList.contains("warn")){
-        fb.textContent = "✖";
-        fb.className = "feedback bad";
-      }
+      // Show the correct answer if wrong
+      fb.textContent = `✖  Correct: ${item.word}`;
+      fb.className = "feedback bad";
     }
   });
+
   document.getElementById("spellScore").textContent = score + "/10";
 }
 
 function resetOne(i){
-  // clear answer + feedback + tiles
+  if(rowState[i].intervalId){
+    clearInterval(rowState[i].intervalId);
+    rowState[i].intervalId = null;
+  }
+  rowState[i].timeLeft = TIME_PER_WORD;
+  rowState[i].locked = false;
+  rowState[i].started = false;
+
   document.getElementById("ans"+i).textContent = "";
   const fb = document.getElementById("fb"+i);
   fb.textContent = "";
   fb.className = "feedback";
+
   document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
 
-  // restart timer + unlock
-  startRowTimer(i);
+  setTimerText(i);
+  unlockRow(i);
 }
 
 function resetSpelling(){
-  // reset all rows
-  spellingWords.forEach((_,i)=>{
-    document.getElementById("ans"+i).textContent = "";
-    const fb = document.getElementById("fb"+i);
-    fb.textContent = "";
-    fb.className = "feedback";
-    document.querySelectorAll(`#tiles${i} .tile`).forEach(t=>t.classList.remove("used"));
-    startRowTimer(i);
-  });
+  spellingWords.forEach((_,i)=>resetOne(i));
   document.getElementById("spellScore").textContent = "0/10";
 }
 
 /* =========================================================
-   PART 2: VOCAB IN CONTEXT (dropdown)
+   PART 2: CONTEXT
    ========================================================= */
 const ctxWords = [
   "journey","desert","exhausted","dazzling","refreshed",
   "drop","soar","come up with","locate","narrow"
 ];
 
-// Build context questions (10)
 const contextItems = [
   { ans:"journey", sentence:"The crow flew for days. It was a long ______." },
   { ans:"desert", sentence:"There were no trees or water. It was a ______." },
@@ -473,7 +486,6 @@ function renderContext(){
     const selId = `c${idx+1}`;
     const fbId = `cf${idx+1}`;
 
-    // build options: correct + 3 distractors
     const pool = ctxWords.filter(w => w !== it.ans);
     const distractors = shuffle(pool).slice(0,3);
     const options = shuffle([it.ans, ...distractors]);
@@ -520,7 +532,7 @@ function resetContext(){
 }
 
 /* =========================================================
-   PART 3: COMPREHENSION (5 questions + tips)
+   PART 3: COMPREHENSION
    ========================================================= */
 const compAnswers = {
   q1:{ correct:"a", help:"Tip: At the start, the crow lands in a place with sand and no water." },
